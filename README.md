@@ -66,6 +66,21 @@ The goal is to back up only the keys that were modified during a particular time
 
 Note: The [backup.sh](https://github.com/drewkerrigan/riak-differential-backup/blob/master/backup.sh) included in this guide is meant to be an example. Operational procedures for backup may differ from the methods used in this file.
 
+Modify these lines in [backup.sh](https://github.com/drewkerrigan/riak-differential-backup/blob/master/backup.sh) if necessary:
+
+```
+#Node to query for backups
+RIAK_IP=$1
+RIAK_PB_PORT=8087
+RIAK_HTTP_PORT=8098
+
+#Other Settings
+LOCAL_RDM_LOCATION=~/src/riak-data-migrator/target/riak-data-migrator-0.2.5
+REMOTE_LOG_LOCATION=/var/log/riak
+LOG_FILE_NAME=keyfile.log
+DATA_DIRECTORY_PREFIX=output
+```
+
 Gather, process, and merge the log files from each node in the cluster from the backup machine using [backup.sh](https://github.com/drewkerrigan/riak-differential-backup/blob/master/backup.sh) (automate with cron)
 
 ```
@@ -84,7 +99,7 @@ Gather, process, and merge the log files from each node in the cluster from the 
 
 	```
 	mkdir output-20130510
-	java -jar riak-data-migrator-0.2.4.jar -d --loadkeys bucketKeyNameFile.txt -r output-20130510 -h 127.0.0.1 -p 8087 -H 8098
+	java -jar riak-data-migrator-0.2.5.jar -d --loadkeys bucketKeyNameFile.txt -r output-20130510 -h 127.0.0.1 -p 8087 -H 8098
 	```
 
 #Restore
@@ -92,7 +107,7 @@ Gather, process, and merge the log files from each node in the cluster from the 
 Iterate through each of the generated backup directories and run the [riak-data-migrator tool](https://github.com/basho/riak-data-migrator) load functionality
 
 ```
-java -jar riak-data-migrator-0.2.4.jar -l -r output-20130510 -a -h 127.0.0.1 -p 8087 -H 8098
+java -jar riak-data-migrator-0.2.5.jar -l -r output-20130510 -a -h 127.0.0.1 -p 8087 -H 8098
 ```
 
 #Testing
@@ -105,7 +120,7 @@ RIAK_DATA_LOCATION=~/src/riak-1.2.1/rel/riak/data
 KEYLOG_LOCATION=~/src/riak-1.2.1/rel/riak/log
 CODE_LOCATION=`pwd`
 BEAMS_LOCATION=/tmp/beams
-RDM_LOCATION=~/src/riak-data-migrator/target/riak-data-migrator-0.2.4
+RDM_LOCATION=~/src/riak-data-migrator/target/riak-data-migrator-0.2.5
 BB_LOCATION=~/src/basho_bench
 RIAK_IP=127.0.0.1
 RIAK_HTTP_PORT=8098

@@ -6,7 +6,7 @@ RIAK_PB_PORT=8087
 RIAK_HTTP_PORT=8098
 
 #Other Settings
-LOCAL_RDM_LOCATION=~/src/riak-data-migrator/target/riak-data-migrator-0.2.4
+LOCAL_RDM_LOCATION=~/src/riak-data-migrator/target/riak-data-migrator-0.2.5
 REMOTE_LOG_LOCATION=/var/log/riak
 LOG_FILE_NAME=keyfile.log
 DATA_DIRECTORY_PREFIX=output
@@ -48,4 +48,4 @@ done
 cd $LOCAL_RDM_LOCATION
 mkdir $BACKUP_DIRECTORY
 echo "Backing up $PROCESSED_KEYFILE to $DATA_DIRECTORY_PREFIX-$TIMESTAMP"
-java -jar riak-data-migrator-0.2.4.jar -d --loadkeys $PROCESSED_KEYFILE -r $BACKUP_DIRECTORY -h $RIAK_IP -p $RIAK_PB_PORT -H $RIAK_HTTP_PORT
+java -jar riak-data-migrator-0.2.5.jar -d --loadkeys $PROCESSED_KEYFILE -r $BACKUP_DIRECTORY -h $RIAK_IP -p $RIAK_PB_PORT -H $RIAK_HTTP_PORT

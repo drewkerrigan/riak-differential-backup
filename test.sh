@@ -4,7 +4,7 @@ RIAK_DATA_LOCATION=~/src/riak-1.2.1/rel/riak/data
 KEYLOG_LOCATION=~/src/riak-1.2.1/rel/riak/log
 CODE_LOCATION=`pwd`
 BEAMS_LOCATION=/tmp/beams
-RDM_LOCATION=~/src/riak-data-migrator/target/riak-data-migrator-0.2.4
+RDM_LOCATION=~/src/riak-data-migrator/target/riak-data-migrator-0.2.5
 BB_LOCATION=~/src/basho_bench
 RIAK_IP=127.0.0.1
 RIAK_HTTP_PORT=8098
@@ -69,13 +69,13 @@ function rotate_log() {
 function run_backup() {
 	echo "Running Backup"
 	cd $RDM_LOCATION
-	java -jar riak-data-migrator-0.2.4.jar -d --loadkeys bucketKeyNameFile.txt -r $1 -h $RIAK_IP -p $RIAK_PB_PORT -H $RIAK_HTTP_PORT
+	java -jar riak-data-migrator-0.2.5.jar -d --loadkeys bucketKeyNameFile.txt -r $1 -h $RIAK_IP -p $RIAK_PB_PORT -H $RIAK_HTTP_PORT
 }
 
 function load_from_backup() {
 	echo "Reloading from Backup"
 	cd $RDM_LOCATION
-	java -jar riak-data-migrator-0.2.4.jar -l -r $1 -a -h $RIAK_IP -p $RIAK_PB_PORT -H $RIAK_HTTP_PORT
+	java -jar riak-data-migrator-0.2.5.jar -l -r $1 -a -h $RIAK_IP -p $RIAK_PB_PORT -H $RIAK_HTTP_PORT
 }
 
 init
