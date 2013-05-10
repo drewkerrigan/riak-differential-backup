@@ -80,11 +80,11 @@ Gather, process, and merge the log files from each node in the cluster from the 
 	```
 	sort keyfile.log | uniq | grep -v delete | sed -e s/store,//g >> bucketKeyNameFile.txt
 	```
-3. Run the [riak-data-migrator tool](https://github.com/basho/riak-data-migrator) with the -K option to backup the keys in `bucketKeyNameFile.txt` (replace `output-20130510` with the backup data directory)
+3. Run the [riak-data-migrator tool](https://github.com/basho/riak-data-migrator) with the --loadkeys option to backup the keys in `bucketKeyNameFile.txt` (replace `output-20130510` with the backup data directory)
 
 	```
 	mkdir output-20130510
-	java -jar riak-data-migrator-0.2.4.jar -d -K bucketKeyNameFile.txt -r output-20130510 -h 127.0.0.1 -p 8087 -H 8098
+	java -jar riak-data-migrator-0.2.4.jar -d --loadkeys bucketKeyNameFile.txt -r output-20130510 -h 127.0.0.1 -p 8087 -H 8098
 	```
 
 #Restore

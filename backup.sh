@@ -48,4 +48,4 @@ done
 cd $LOCAL_RDM_LOCATION
 mkdir $BACKUP_DIRECTORY
 echo "Backing up $PROCESSED_KEYFILE to $DATA_DIRECTORY_PREFIX-$TIMESTAMP"
-java -jar riak-data-migrator-0.2.4.jar -d -K $PROCESSED_KEYFILE -r $BACKUP_DIRECTORY -h $RIAK_IP -p $RIAK_PB_PORT -H $RIAK_HTTP_PORT
+java -jar riak-data-migrator-0.2.4.jar -d --loadkeys $PROCESSED_KEYFILE -r $BACKUP_DIRECTORY -h $RIAK_IP -p $RIAK_PB_PORT -H $RIAK_HTTP_PORT

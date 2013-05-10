@@ -69,7 +69,7 @@ function rotate_log() {
 function run_backup() {
 	echo "Running Backup"
 	cd $RDM_LOCATION
-	java -jar riak-data-migrator-0.2.4.jar -d -K bucketKeyNameFile.txt -r $1 -h $RIAK_IP -p $RIAK_PB_PORT -H $RIAK_HTTP_PORT
+	java -jar riak-data-migrator-0.2.4.jar -d --loadkeys bucketKeyNameFile.txt -r $1 -h $RIAK_IP -p $RIAK_PB_PORT -H $RIAK_HTTP_PORT
 }
 
 function load_from_backup() {
