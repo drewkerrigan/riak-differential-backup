@@ -15,17 +15,24 @@ The goal is to back up only the keys that were modified during a particular time
 
 ####Complete the following steps on each of the nodes in the cluster:
 
-1. Compile [log_key.erl](https://github.com/drewkerrigan/riak-differential-backup/blob/master/log_key.erl)
+1. Modify [log_key.erl](https://github.com/drewkerrigan/riak-differential-backup/blob/master/log_key.erl) as necessary to change the log location.
+
+	```
+	%% ...
+	file:write_file("log/keyfile.log", 
+	%% ...
+	```
+2. Compile [log_key.erl](https://github.com/drewkerrigan/riak-differential-backup/blob/master/log_key.erl)
 
 	```
 	erlc log_key.erl
 	```
-2. Move the resulting `log_key.beam` to `/tmp/beams`.
+3. Move the resulting `log_key.beam` to `/tmp/beams` or another code directory.
 
 	```
 	mv log_key.beam /tmp/beams/log_key.beam
 	```
-3. Create an add_paths in the riak_kv section of app.config (replace `/tmp/beams/` another code directory if desired).
+4. Create an add_paths in the riak_kv section of app.config (replace `/tmp/beams/` with another code directory if desired).
 
 	```
 	{riak_kv, [
@@ -33,7 +40,7 @@ The goal is to back up only the keys that were modified during a particular time
 	  {add_paths, ["/tmp/beams/"]},
 	  %% ...
 	```
-4. Restart Riak.
+5. Restart Riak.
 
 	```
 	riak restart
@@ -57,26 +64,37 @@ The goal is to back up only the keys that were modified during a particular time
 
 ####Complete the following from a backup / coordinating machine
 
-2. Gather, process, and merge the log files from each node in the cluster from the backup machine using [backup.sh](https://github.com/drewkerrigan/riak-differential-backup/blob/master/backup.sh) (automate with cron)
+Note: The [backup.sh](https://github.com/drewkerrigan/riak-differential-backup/blob/master/backup.sh) included in this guide is meant to be an example. Operational procedures for backup may differ from the methods used in this file.
 
-	```
-	./backup.sh <riak_node_1> [<riak_node_2> …]
-	```
+Gather, process, and merge the log files from each node in the cluster from the backup machine using [backup.sh](https://github.com/drewkerrigan/riak-differential-backup/blob/master/backup.sh) (automate with cron)
+
+```
+./backup.sh <riak_node_1> [<riak_node_2> …]
+```
 
 ####Alternatively, complete the steps manually as follows
 
 1. Rotate and copy keyfile.log from each of the nodes in the cluster
-1. De-duplicate keynames and remove deletes from each of the `keyfile.log` files.
+2. De-duplicate keynames and remove deletes from each of the `keyfile.log` files.
 
 	```
 	sort keyfile.log | uniq | grep -v delete | sed -e s/store,//g >> bucketKeyNameFile.txt
 	```
-2. Run the [riak-data-migrator tool](https://github.com/basho/riak-data-migrator) with the -K option to backup the keys in `bucketKeyNameFile.txt` (replace `output` with the backup data directory)
+3. Run the [riak-data-migrator tool](https://github.com/basho/riak-data-migrator) with the -K option to backup the keys in `bucketKeyNameFile.txt` (replace `output-20130510` with the backup data directory)
 
 	```
-	java -jar riak-data-migrator-0.2.4.jar -d -K bucketKeyNameFile.txt -r output -h 127.0.0.1 -p 8087 -H 8098
+	mkdir output-20130510
+	java -jar riak-data-migrator-0.2.4.jar -d -K bucketKeyNameFile.txt -r output-20130510 -h 127.0.0.1 -p 8087 -H 8098
 	```
-	
+
+#Restore
+
+Iterate through each of the generated backup directories and run the [riak-data-migrator tool](https://github.com/basho/riak-data-migrator) load functionality
+
+```
+java -jar riak-data-migrator-0.2.4.jar -l -r output-20130510 -a -h 127.0.0.1 -p 8087 -H 8098
+```
+
 #Testing
 
 Modify the following lines in [test.sh](https://github.com/drewkerrigan/riak-differential-backup/blob/master/test.sh) to complete a single node test

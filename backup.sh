@@ -1,4 +1,12 @@
 #!/bin/bash
+BACKUP_NODE=$1
+REMOTE_LOG_LOCATION=
+
+# Loop over each of the ip addresses and grab keyfile.log
+for var in "$@"
+do
+    echo "$var"
+done
 
 #ssh to each of the clients and rotate then grab the keyfile.log
 
@@ -20,4 +28,3 @@ gzip -f -9 $newlogfile
 sort keyfile.log | uniq | grep -v delete | sed -e s/store,//g >> bucketKeyNameFile.txt
 
 # Run the data migrator
-
