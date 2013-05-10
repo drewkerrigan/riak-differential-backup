@@ -1,30 +1,51 @@
 #!/bin/bash
-BACKUP_NODE=$1
-REMOTE_LOG_LOCATION=
+
+#Node to query for backups
+RIAK_IP=$1
+RIAK_PB_PORT=8087
+RIAK_HTTP_PORT=8098
+
+#Other Settings
+LOCAL_RDM_LOCATION=~/src/riak-data-migrator/target/riak-data-migrator-0.2.4
+REMOTE_LOG_LOCATION=/var/log/riak
+LOG_FILE_NAME=keyfile.log
+DATA_DIRECTORY_PREFIX=output
+
+TIMESTAMP=`date +%Y%m%d`
+LOGFILE="$REMOTE_LOG_LOCATION/$LOG_FILE_NAME"
+NEWLOGFILE="$LOGFILE.$TIMESTAMP"
+FILECOUNTER=1
+PROCESSED_KEYFILE=$LOCAL_RDM_LOCATION/bucketKeyNameFile.$TIMESTAMP.txt
+BACKUP_DIRECTORY=$DATA_DIRECTORY_PREFIX-$TIMESTAMP
+
+echo "Starting Backup"
 
 # Loop over each of the ip addresses and grab keyfile.log
-for var in "$@"
+HOSTCOUNTER=1
+for HOST in "$@"
 do
-    echo "$var"
+	echo "Rotating and copying $LOG_FILE_NAME from $HOST"
+    ssh $HOST "cp $LOGFILE $NEWLOGFILE ; cat /dev/null > $LOGFILE"
+    scp $HOST:$NEWLOGFILE $LOCAL_RDM_LOCATION/$LOG_FILE_NAME.$TIMESTAMP.$HOSTCOUNTER
+
+    HOSTCOUNTER=$((HOSTCOUNTER + 1))
 done
 
-#ssh to each of the clients and rotate then grab the keyfile.log
 
-#Rotate log file, TODO:convert to function.
+# Process log files
+rm $PROCESSED_KEYFILE
+HOSTCOUNTER=1
+for HOST in "$@"
+do
+	echo "Processing $LOG_FILE_NAME.$TIMESTAMP.$HOSTCOUNTER"
+	ORIG=$LOCAL_RDM_LOCATION/$LOG_FILE_NAME.$TIMESTAMP.$HOSTCOUNTER
+	sort $ORIG | uniq | grep -v delete | grep -v '^$' | sed -e s/store,//g >> $PROCESSED_KEYFILE
 
-logfile=$1
-if [ ! -f $logfile ]; then
-  echo "log file not found $logfile"
-  exit 1
-fi
-timestamp=`date +%Y%m%d`
-newlogfile=$logfile.$timestamp
-cp $logfile $newlogfile
-cat /dev/null > $logfile
-gzip -f -9 $newlogfile
+	HOSTCOUNTER=$((HOSTCOUNTER + 1))
+done
 
-# Merge and dedup the files
-
-sort keyfile.log | uniq | grep -v delete | sed -e s/store,//g >> bucketKeyNameFile.txt
-
-# Run the data migrator
+# Perform backup
+cd $LOCAL_RDM_LOCATION
+mkdir $BACKUP_DIRECTORY
+echo "Backing up $PROCESSED_KEYFILE to $DATA_DIRECTORY_PREFIX-$TIMESTAMP"
+java -jar riak-data-migrator-0.2.4.jar -d -K $PROCESSED_KEYFILE -r $BACKUP_DIRECTORY -h $RIAK_IP -p $RIAK_PB_PORT -H $RIAK_HTTP_PORT
