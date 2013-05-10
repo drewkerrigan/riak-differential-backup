@@ -76,3 +76,26 @@ The goal is to back up only the keys that were modified during a particular time
 	```
 	java -jar riak-data-migrator-0.2.4.jar -d -K bucketKeyNameFile.txt -r output -h 127.0.0.1 -p 8087 -H 8098
 	```
+	
+#Testing
+
+Modify the following lines in [test.sh](https://github.com/drewkerrigan/riak-differential-backup/blob/master/test.sh) to complete a single node test
+
+```
+RIAK_BIN_LOCATION=~/src/riak-1.2.1/rel/riak/bin
+RIAK_DATA_LOCATION=~/src/riak-1.2.1/rel/riak/data
+KEYLOG_LOCATION=~/src/riak-1.2.1/rel/riak/log
+CODE_LOCATION=`pwd`
+BEAMS_LOCATION=/tmp/beams
+RDM_LOCATION=~/src/riak-data-migrator/target/riak-data-migrator-0.2.4
+BB_LOCATION=~/src/basho_bench
+RIAK_IP=127.0.0.1
+RIAK_HTTP_PORT=8098
+RIAK_PB_PORT=8087
+```
+
+Run the following from the directory that you've downloaded this repository to:
+
+```
+./test.sh
+```
